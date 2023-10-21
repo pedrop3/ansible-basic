@@ -1,0 +1,56 @@
+---
+- hosts: ubuntu
+  become: yes
+  gather_facts: no
+
+  vars:
+    defaut_dir: /opt/custom
+    check: "{{ defaut_dir }}/check"
+    dict_dir: {
+      check: "{{ check }}",
+      log : "{{ defaut_dir }}/log",
+    }
+
+  tasks:
+  - name: "Install htop ubuntu"
+    apt:
+      update_cache: yes
+      name: "htop"
+      state: present
+
+  - name: "Seting hosts name to servers"
+    hostname:
+      name: "{{ hostname }}"
+
+  - name: "Creted dir in another servers"
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: pedrosantos
+      group: pedrosantos
+    with_items:
+    - "{{ dict_dir.check }}"
+    - "{{ defaut_dir }}/backup"
+    - "{{ defaut_dir }}/log"
+
+  - name: "Crete file"
+    file:
+      path: "{{ defaut_dir }}/teste.py"
+      state: touch
+      owner: pedrosantos
+      group: pedrosantos
+      mode: 755
+      modification_time: preserve
+      access_time: preserve
+
+  - name: "Debug"
+    debug:
+      msg: "{{ dict_dir }}"
+
+  - name: "Registrer"
+    shell: "date -u"
+    register: linux_date
+
+  - name: "Registrer Debug"
+    debug:
+      msg: "{{ linux_date.start }}"
