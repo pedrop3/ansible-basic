@@ -1,0 +1,14 @@
+---
+# handlers file for serverTools
+- name: "addInHostsFile"
+  lineinfile:
+    path: "/etc/hosts"
+    line: "127.0.0.1 {{ hostname }}"
+
+- name: "Restart Server"
+  reboot:
+
+- name: "enabled yum-utils"
+  shell:
+    cmd: "yum-config-manager --enable remi-php74"
+    

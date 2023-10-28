@@ -1,0 +1,51 @@
+---
+- name: Set a hostname
+  hostname:
+    name: "{{ hostname }}"
+  notify:
+    - addInHostsFile
+
+- name: "Role: serverTools - Ubuntu"
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+    name:
+      - vim
+      - iftop
+      - zip
+      - wget
+      - curl
+      - python3
+    state: latest
+
+- name: "Role: serverTools - Ubuntu"
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+    name:
+      - vim
+      - iftop
+      - zip
+      - wget
+      - curl
+      - python3
+      - yum-utils
+    state: latest
+  when: (ansible_facts['os_family'] == "RedHat")
+  notify:
+  - enabled yum-utils
+  
+- name: "Trafego http firewalld" ## TODO- add Certificado
+  firewalld:
+    service: http
+    permanent: yes
+    state: enabled
+  when: (ansible_facts['os_family'] == "RedHat")
+  
+
+- name: "Disable SELinux" # Only dev mode
+  selinux:
+    state: disabled
+  notify:
+  - Restart Server
+  when: (ansible_facts['os_family'] == "RedHat")

@@ -1,0 +1,52 @@
+---
+# tasks file for mysql
+- name: "Install MariaDB - Debian"
+  yum:
+    name:
+      - mariadb-server
+      - MySQL-python
+    state: present
+  when: (ansible_facts['os_family'] == "RedHat")
+
+- name: "Install MariaDB - Debian"
+  apt:
+    name:
+      - mariadb-server
+      - python3-pymysql
+    state: present
+
+- name: "Start MariaDB"
+  service:
+    name: mariadb
+    state: started
+    enabled: yes
+
+- name: "Criando banco dados Ubuntu"
+  mysql_db:
+    login_unix_socket: "/var/run/mysqld/mysqld.sock"
+    name: "{{ db_wp_name }}"
+    state: present
+
+- name: "Criando banco dados Debian"
+  mysql_db:
+    name: "{{ db_wp_name }}"
+    state: present
+  when: (ansible_facts['os_family'] == "RedHat")
+
+
+- name: "Create user with password, all database privileges - Ubuntu"
+  mysql_user:
+    login_unix_socket: "/var/run/mysqld/mysqld.sock"
+    name: "{{ dp_wp_username }}"
+    password: "{{ db_wp_password }}"
+    priv: "{{ dp_wp_username }}.*:ALL,GRANT"
+    state: present
+
+- name: "Create user with password, all database privileges - Debian"
+  mysql_user:
+    login_unix_socket: "/var/run/mysqld/mysqld.sock"
+    name: "{{ dp_wp_username }}"
+    password: "{{ db_wp_password }}"
+    priv: "{{ dp_wp_username }}.*:ALL,GRANT"
+    state: present
+  when: (ansible_facts['os_family'] == "RedHat")

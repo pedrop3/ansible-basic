@@ -1,0 +1,7 @@
+---
+- hosts: ubuntu
+  become: yes
+
+  roles:
+    - serverTools
+    - mysql
